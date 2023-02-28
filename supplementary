@@ -11,3 +11,31 @@ st2 <- st2 %>%
 
 write.xlsx(data.frame(st2), file="mr_output/met-c-859/supplementary/Supplementary_Tables_AntidiabeticsMR.xlsx", 
            sheetName="ST2",append=TRUE, rowNames = FALSE, showNA = FALSE)
+           
+# supplementary table 3
+input_exp <- fread("mr_output/met-c-859/supplementary/input_exp.csv",
+                   stringsAsFactors = FALSE,
+                   data.table = FALSE)
+
+input_exp <- input_exp[,c("gene","tissue","keep")]
+
+colnames(input_exp) <- c("gene","tissue","ind.ins")
+
+mr_exp_glu <- fread("mr_output/met-c-859/supplementary/mr_exp_glu.csv",
+                    stringsAsFactors = FALSE,
+                    data.table = FALSE)
+
+st3 <- merge(input_exp,mr_exp_glu,all.x = TRUE, by = c("gene","tissue"))
+
+st3$ind.mr <- ifelse(!is.na(st3$beta.mr),TRUE,FALSE)
+
+st3$ind.gluev <- ifelse(!is.na(st3$beta.mr) & sign(st3$lci.mr)==sign(st3$uci.mr),TRUE,FALSE)
+
+st3 <- st3[,c(1:2,11,19:20,24:25,21:23,6,9:10,3,26:27)]
+
+colnames(st3) <- c(colnames(st3)[1:2],"SNP",colnames(st3)[4:7],
+                   "beta.expression","se.expression","pval.expression",
+                   colnames(st3)[11:16])
+
+write.xlsx(data.frame(st3), file="mr_output/met-c-859/supplementary/Supplementary_Tables_AntidiabeteicsMR.xlsx", 
+           sheetName="st3",append=TRUE, rowNames = FALSE, showNA = FALSE)
