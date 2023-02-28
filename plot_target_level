@@ -1,0 +1,72 @@
+results <-results_drug_level
+results <- filter(results, p<0.05)
+results <-filter(results, !SNP %in% c("All - Inverse variance weighted"))
+results <- merge(results, SNP_drug, by = c("SNP"))
+results <- results[,c("outcome","SNP","gene","drug.x","p","or","uci","lci")]
+results <- filter(results, drug.x=="Alpha Glucosidase Inhibitors")
+
+
+
+# Create OR labels ============================================================
+
+results$orlab <- paste0("OR: ",
+                        ifelse(sprintf("%.2f",results$or)<0.0051,
+                               format(results$or,scientific = TRUE,digits=3),
+                               sprintf("%.2f",results$or)),
+                        " (95% CI: ", 
+                        ifelse(sprintf("%.2f",results$lci)<0.0051,
+                               format(results$lci,scientific = TRUE,digits=3),
+                               sprintf("%.2f",results$lci)),
+                        " to ",
+                        ifelse(sprintf("%.2f",results$uci)<0.0051,
+                               format(results$uci,scientific = TRUE,digits=3),
+                               sprintf("%.2f",results$uci)),
+                        ")")
+
+
+results$orlab <- ifelse(results$p>=0.01 & results$p<=0.99,
+                        paste0(results$orlab,"; p = ", sprintf("%.3f",results$p)), results$orlab)
+
+results$orlab <- ifelse(results$p<=0.01 & results$p>=0.001,
+                        paste0(results$orlab,"; p = ", sprintf("%.3f",results$p)), results$orlab)
+#results$orlab <- ifelse(results$p<0.001,
+#                       paste0(results$orlab,"; p = ", sprintf("%.3f",results$p)), results$orlab)
+
+results$orlab <- ifelse(results$p<0.001,
+                        paste0(results$orlab,"; p < 0.001"), results$orlab)
+
+results$orlab <- ifelse(results$p>0.99,
+                        paste0(results$orlab,"; p > 0.99"), results$orlab)
+
+results$genelab <-paste0(results$gene, " ; ", results$SNP)
+
+
+colnames(results)<- c("Outcome", "SNP", "gene", "Drug", " p", " ", " ", "","OR (95% CI); p value", "Gene; SNP") 
+
+results2<-result
+
+library(forestplot)
+
+write.csv(results,file="mr_output/met-c-859/tmp_results_3levels.csv",row.names = FALSE,na = "")
+results<- read.csv("mr_output/met-c-859/tmp_results_3levels.csv", header = FALSE)
+results<- data.frame(results)
+
+forestplot(labeltext = as.matrix(results[,c(1, 10, 9)]),
+           mean = results$V6,
+           lower = results$V8,
+           upper = results$V7, 
+           align = c("l", "l", "l","l","l"),
+           colgap = unit(4,'mm'),
+           zero = 1, 
+           boxsize = 0.05, 
+           lwd.zero = 2,
+           lwd.ci = 2,
+           lineheight = unit(4, 'mm'),
+           graphwidth = unit(120, 'mm'), 
+           xlab= "OR and 95% CI for developing cancer \n for 1 SD decrease in circulating glucose level",
+           graph.pos = 3,
+           clip =c(-1, 100000),
+           xticks = c(0, 1, 100000),
+           txt_gp=fpTxtGp(xlab=gpar(cex=1.1), ticks=gpar(cex=1.1)),
+           col = fpColors(lines = "#FF0000", box = "#000000"),
+           gp = gpar(fill = "#FFFFFF"))
