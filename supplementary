@@ -1,5 +1,5 @@
 # Supplementary Table 2 =======================================================
-drug_targets<- read.csv("mr_output/met-c-859/drug_targets.csv",  sep = "\t", )
+drug_targets<- read.csv("mr_output/met-c-859/drug_targets.csv",  sep = ",", )
 
 st2 <- unique(drug_targets)
 
