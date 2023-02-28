@@ -2,7 +2,7 @@ clean_bnf <- function() {
   
   # Load BNF data ===============================================================
   
-  df <- read_csv("exposure4.csv")
+  df <- read_csv("exposure.csv")
   
   # Format dataframe ============================================================
   
