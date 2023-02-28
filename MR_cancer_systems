@@ -1,0 +1,925 @@
+##Cancer System
+####skin
+outcome_gu<-read.csv("gwas_data/meta_skin1.csv",  sep = "\t", )
+outcome_gu$phenotype<- 'skin system'
+
+outcome_dat <- format_data(
+  dat=outcome_gu,
+  type = "outcome",
+  snps = input_glu$SNP,
+  header = TRUE,
+  phenotype_col = "phenotype",
+  snp_col = "MarkerName",
+  beta_col = "Effect",
+  se_col = "StdErr",
+  effect_allele_col = "Allele1",
+  other_allele_col = "Allele2",
+  pval_col = "P.value",
+)
+H_data1 <- harmonise_data(
+  exposure_dat = exp_dat, 
+  outcome_dat = outcome_dat
+)
+
+skin_singlesnp_results<-mr_singlesnp(
+  H_data1,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+mr_forest_plot(skin_singlesnp_results, exponentiate = FALSE)
+ggsave("mr_output/met-c-859/system_final/forest/skin_system.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+skin_leaveoneout_results<-mr_leaveoneout(H_data1, parameters = default_parameters(), method = mr_ivw)
+mr_leaveoneout_plot(skin_leaveoneout_results)
+ggsave("mr_output/met-c-859/system_final/leaveoneout/skin_system.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+skin_singlesnp_results_IVW <- filter(skin_singlesnp_results, 
+                                     SNP=="All - Inverse variance weighted")
+skin_singlesnp_results_IVW$drug<-"combined"
+skin_singlesnp_results_Egger <- filter(skin_singlesnp_results, 
+                                       SNP=="All - MR Egger")
+skin_singlesnp_results_Egger$drug<-"combined"
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Alpha glucosidase inhibitors")
+
+
+skin_singlesnp_results_alpha<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+skin_singlesnp_results_alpha$drug<-"Alpha glucosidase inhibitors"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Amylin analog")
+
+skin_singlesnp_results_amylin<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+skin_singlesnp_results_amylin$drug<-"Amylin analog"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Sulfonylureas")
+
+skin_singlesnp_results_sulfonylureas<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+skin_singlesnp_results_sulfonylureas$drug<-"sulfonylureas"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "biguanides")
+
+skin_singlesnp_results_biguanides<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+skin_singlesnp_results_biguanides$drug<-"Biguanides"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Dipeptidyl peptidase 4 (dpp-iv) inhibitor")
+
+skin_singlesnp_results_dpp<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+skin_singlesnp_results_dpp$drug<-"Dipeptidyl peptidase 4 (dpp-iv) inhibitor"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Insulins")
+
+skin_singlesnp_results_Insulins<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+skin_singlesnp_results_Insulins$drug<-"Insulins"
+
+
+skin_singlesnp_results <- rbind(skin_singlesnp_results_Egger,
+                                skin_singlesnp_results_IVW,
+                                skin_singlesnp_results_alpha,
+                                skin_singlesnp_results_amylin,
+                                skin_singlesnp_results_sulfonylureas,
+                                skin_singlesnp_results_biguanides,
+                                skin_singlesnp_results_dpp,
+                                skin_singlesnp_results_Insulins)
+
+skin_singlesnp_results$or<-1/exp(skin_singlesnp_results$b)
+skin_singlesnp_results$uci <- 1/exp(skin_singlesnp_results$b-1.96*skin_singlesnp_results$se)
+skin_singlesnp_results$lci <- 1/exp(skin_singlesnp_results$b+1.96*skin_singlesnp_results$se)
+
+
+####respiratory
+outcome_gu<-read.csv("gwas_data/meta_respiratory1.csv",  sep = "\t", )
+outcome_gu$phenotype<- 'respiratory system'
+
+outcome_dat <- format_data(
+  dat=outcome_gu,
+  type = "outcome",
+  snps = input_glu$SNP,
+  header = TRUE,
+  phenotype_col = "phenotype",
+  snp_col = "MarkerName",
+  beta_col = "Effect",
+  se_col = "StdErr",
+  effect_allele_col = "Allele1",
+  other_allele_col = "Allele2",
+  pval_col = "P.value",
+)
+H_data1 <- harmonise_data(
+  exposure_dat = exp_dat, 
+  outcome_dat = outcome_dat
+)
+
+respiratory_singlesnp_results<-mr_singlesnp(
+  H_data1,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+mr_forest_plot(respiratory_singlesnp_results, exponentiate = FALSE)
+ggsave("mr_output/met-c-859/system_final/forest/respiratory_cancer.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+respiratory_leaveoneout_results<-mr_leaveoneout(H_data1, parameters = default_parameters(), method = mr_ivw)
+mr_leaveoneout_plot(respiratory_leaveoneout_results)
+ggsave("mr_output/met-c-859/system_final/leaveoneout/respiratory_cancer.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+respiratory_singlesnp_results_IVW <- filter(respiratory_singlesnp_results, 
+                                            SNP=="All - Inverse variance weighted")
+respiratory_singlesnp_results_IVW$drug<-"combined"
+respiratory_singlesnp_results_Egger <- filter(respiratory_singlesnp_results, 
+                                              SNP=="All - MR Egger")
+respiratory_singlesnp_results_Egger$drug<-"combined"
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Alpha glucosidase inhibitors")
+
+
+respiratory_singlesnp_results_alpha<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+respiratory_singlesnp_results_alpha$drug<-"Alpha glucosidase inhibitors"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Amylin analog")
+
+respiratory_singlesnp_results_amylin<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+respiratory_singlesnp_results_amylin$drug<-"Amylin analog"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Sulfonylureas")
+
+respiratory_singlesnp_results_sulfonylureas<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+respiratory_singlesnp_results_sulfonylureas$drug<-"sulfonylureas"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "biguanides")
+
+respiratory_singlesnp_results_biguanides<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+respiratory_singlesnp_results_biguanides$drug<-"Biguanides"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Dipeptidyl peptidase 4 (dpp-iv) inhibitor")
+
+respiratory_singlesnp_results_dpp<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+respiratory_singlesnp_results_dpp$drug<-"Dipeptidyl peptidase 4 (dpp-iv) inhibitor"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Insulins")
+
+respiratory_singlesnp_results_Insulins<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+respiratory_singlesnp_results_Insulins$drug<-"Insulins"
+
+
+respiratory_singlesnp_results <- rbind(respiratory_singlesnp_results_Egger,
+                                       respiratory_singlesnp_results_IVW,
+                                       respiratory_singlesnp_results_alpha,
+                                       respiratory_singlesnp_results_amylin,
+                                       respiratory_singlesnp_results_sulfonylureas,
+                                       respiratory_singlesnp_results_biguanides,
+                                       respiratory_singlesnp_results_dpp,
+                                       respiratory_singlesnp_results_Insulins)
+
+respiratory_singlesnp_results$or<-1/exp(respiratory_singlesnp_results$b)
+respiratory_singlesnp_results$uci <- 1/exp(respiratory_singlesnp_results$b-1.96*respiratory_singlesnp_results$se)
+respiratory_singlesnp_results$lci <- 1/exp(respiratory_singlesnp_results$b+1.96*respiratory_singlesnp_results$se)
+
+####gynecologic
+outcome_gu<-read.csv("gwas_data/meta_gynecologic1.csv",  sep = "\t", )
+outcome_gu$phenotype<- 'gynecologic system'
+
+outcome_dat <- format_data(
+  dat=outcome_gu,
+  type = "outcome",
+  snps = input_glu$SNP,
+  header = TRUE,
+  phenotype_col = "phenotype",
+  snp_col = "MarkerName",
+  beta_col = "Effect",
+  se_col = "StdErr",
+  effect_allele_col = "Allele1",
+  other_allele_col = "Allele2",
+  pval_col = "P.value",
+)
+H_data1 <- harmonise_data(
+  exposure_dat = exp_dat, 
+  outcome_dat = outcome_dat
+)
+
+gynecologic_singlesnp_results<-mr_singlesnp(
+  H_data1,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+mr_forest_plot(gynecologic_singlesnp_results, exponentiate = FALSE)
+ggsave("mr_output/met-c-859/system_final/forest/gynecologic_system.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+gynecologic_leaveoneout_results<-mr_leaveoneout(H_data1, parameters = default_parameters(), method = mr_ivw)
+mr_leaveoneout_plot(gynecologic_leaveoneout_results)
+ggsave("mr_output/met-c-859/system_final/leaveoneout/gynecologic_system.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+gynecologic_singlesnp_results_IVW <- filter(gynecologic_singlesnp_results, 
+                                            SNP=="All - Inverse variance weighted")
+gynecologic_singlesnp_results_IVW$drug<-"combined"
+gynecologic_singlesnp_results_Egger <- filter(gynecologic_singlesnp_results, 
+                                              SNP=="All - MR Egger")
+gynecologic_singlesnp_results_Egger$drug<-"combined"
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Alpha glucosidase inhibitors")
+
+
+gynecologic_singlesnp_results_alpha<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gynecologic_singlesnp_results_alpha$drug<-"Alpha glucosidase inhibitors"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Amylin analog")
+
+gynecologic_singlesnp_results_amylin<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gynecologic_singlesnp_results_amylin$drug<-"Amylin analog"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Sulfonylureas")
+
+gynecologic_singlesnp_results_sulfonylureas<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gynecologic_singlesnp_results_sulfonylureas$drug<-"sulfonylureas"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "biguanides")
+
+gynecologic_singlesnp_results_biguanides<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gynecologic_singlesnp_results_biguanides$drug<-"Biguanides"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Dipeptidyl peptidase 4 (dpp-iv) inhibitor")
+
+gynecologic_singlesnp_results_dpp<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gynecologic_singlesnp_results_dpp$drug<-"Dipeptidyl peptidase 4 (dpp-iv) inhibitor"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Insulins")
+
+gynecologic_singlesnp_results_Insulins<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gynecologic_singlesnp_results_Insulins$drug<-"Insulins"
+
+
+gynecologic_singlesnp_results <- rbind(gynecologic_singlesnp_results_Egger,
+                                       gynecologic_singlesnp_results_IVW,
+                                       gynecologic_singlesnp_results_alpha,
+                                       gynecologic_singlesnp_results_amylin,
+                                       gynecologic_singlesnp_results_sulfonylureas,
+                                       gynecologic_singlesnp_results_biguanides,
+                                       gynecologic_singlesnp_results_dpp,
+                                       gynecologic_singlesnp_results_Insulins)
+
+gynecologic_singlesnp_results$or<-1/exp(gynecologic_singlesnp_results$b)
+gynecologic_singlesnp_results$uci <- 1/exp(gynecologic_singlesnp_results$b-1.96*gynecologic_singlesnp_results$se)
+gynecologic_singlesnp_results$lci <- 1/exp(gynecologic_singlesnp_results$b+1.96*gynecologic_singlesnp_results$se)
+
+
+####genitourinary
+outcome_gu<-read.csv("gwas_data/meta_genitourinary2.csv",  sep = "\t", )
+outcome_gu$phenotype<- 'genitourinary system'
+
+outcome_dat <- format_data(
+  dat=outcome_gu,
+  type = "outcome",
+  snps = input_glu$SNP,
+  header = TRUE,
+  phenotype_col = "phenotype",
+  snp_col = "MarkerName",
+  beta_col = "Effect",
+  se_col = "StdErr",
+  effect_allele_col = "Allele1",
+  other_allele_col = "Allele2",
+  pval_col = "P.value",
+)
+H_data1 <- harmonise_data(
+  exposure_dat = exp_dat, 
+  outcome_dat = outcome_dat
+)
+
+genitourinary_singlesnp_results<-mr_singlesnp(
+  H_data1,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+mr_forest_plot(genitourinary_singlesnp_results, exponentiate = FALSE)
+ggsave("mr_output/met-c-859/system_final/forest/genitourinary_system.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+genitourinary_leaveoneout_results<-mr_leaveoneout(H_data1, parameters = default_parameters(), method = mr_ivw)
+mr_leaveoneout_plot(genitourinary_leaveoneout_results)
+ggsave("mr_output/met-c-859/system_final/leaveoneout/genitourinary_system.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+genitourinary_singlesnp_results_IVW <- filter(genitourinary_singlesnp_results, 
+                                              SNP=="All - Inverse variance weighted")
+genitourinary_singlesnp_results_IVW$drug<-"combined"
+genitourinary_singlesnp_results_Egger <- filter(genitourinary_singlesnp_results, 
+                                                SNP=="All - MR Egger")
+genitourinary_singlesnp_results_Egger$drug<-"combined"
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Alpha glucosidase inhibitors")
+
+
+genitourinary_singlesnp_results_alpha<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+genitourinary_singlesnp_results_alpha$drug<-"Alpha glucosidase inhibitors"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Amylin analog")
+
+genitourinary_singlesnp_results_amylin<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+genitourinary_singlesnp_results_amylin$drug<-"Amylin analog"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Sulfonylureas")
+
+genitourinary_singlesnp_results_sulfonylureas<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+genitourinary_singlesnp_results_sulfonylureas$drug<-"sulfonylureas"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "biguanides")
+
+genitourinary_singlesnp_results_biguanides<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+genitourinary_singlesnp_results_biguanides$drug<-"Biguanides"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Dipeptidyl peptidase 4 (dpp-iv) inhibitor")
+
+genitourinary_singlesnp_results_dpp<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+genitourinary_singlesnp_results_dpp$drug<-"Dipeptidyl peptidase 4 (dpp-iv) inhibitor"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Insulins")
+
+genitourinary_singlesnp_results_Insulins<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+genitourinary_singlesnp_results_Insulins$drug<-"Insulins"
+
+
+genitourinary_singlesnp_results <- rbind(genitourinary_singlesnp_results_Egger,
+                                         genitourinary_singlesnp_results_IVW,
+                                         genitourinary_singlesnp_results_alpha,
+                                         genitourinary_singlesnp_results_amylin,
+                                         genitourinary_singlesnp_results_sulfonylureas,
+                                         genitourinary_singlesnp_results_biguanides,
+                                         genitourinary_singlesnp_results_dpp,
+                                         genitourinary_singlesnp_results_Insulins)
+
+genitourinary_singlesnp_results$or<-1/exp(genitourinary_singlesnp_results$b)
+genitourinary_singlesnp_results$uci <- 1/exp(genitourinary_singlesnp_results$b-1.96*genitourinary_singlesnp_results$se)
+genitourinary_singlesnp_results$lci <- 1/exp(genitourinary_singlesnp_results$b+1.96*genitourinary_singlesnp_results$se)
+
+
+####head and neck
+outcome_gu<-read.csv("gwas_data/meta_head_and_neck2.csv",  sep = "\t", )
+outcome_gu$phenotype<- 'head_and_neck_system'
+
+outcome_dat <- format_data(
+  dat=outcome_gu,
+  type = "outcome",
+  snps = input_glu$SNP,
+  header = TRUE,
+  phenotype_col = "phenotype",
+  snp_col = "MarkerName",
+  beta_col = "Effect",
+  se_col = "StdErr",
+  effect_allele_col = "Allele1",
+  other_allele_col = "Allele2",
+  pval_col = "P.value",
+)
+H_data1 <- harmonise_data(
+  exposure_dat = exp_dat, 
+  outcome_dat = outcome_dat
+)
+
+head_and_neck_singlesnp_results<-mr_singlesnp(
+  H_data1,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+mr_forest_plot(head_and_neck_singlesnp_results, exponentiate = FALSE)
+ggsave("mr_output/met-c-859/system_final/forest/head_and_neck_cancer.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+head_and_neck_leaveoneout_results<-mr_leaveoneout(H_data1, parameters = default_parameters(), method = mr_ivw)
+mr_leaveoneout_plot(head_and_neck_leaveoneout_results)
+ggsave("mr_output/met-c-859/system_final/leaveoneout/head_and_neck_cancer.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+head_and_neck_singlesnp_results_IVW <- filter(head_and_neck_singlesnp_results, 
+                                              SNP=="All - Inverse variance weighted")
+head_and_neck_singlesnp_results_IVW$drug<-"combined"
+head_and_neck_singlesnp_results_Egger <- filter(head_and_neck_singlesnp_results, 
+                                                SNP=="All - MR Egger")
+head_and_neck_singlesnp_results_Egger$drug<-"combined"
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Alpha glucosidase inhibitors")
+
+
+head_and_neck_singlesnp_results_alpha<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+head_and_neck_singlesnp_results_alpha$drug<-"Alpha glucosidase inhibitors"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Amylin analog")
+
+head_and_neck_singlesnp_results_amylin<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+head_and_neck_singlesnp_results_amylin$drug<-"Amylin analog"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Sulfonylureas")
+
+head_and_neck_singlesnp_results_sulfonylureas<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+head_and_neck_singlesnp_results_sulfonylureas$drug<-"sulfonylureas"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "biguanides")
+
+head_and_neck_singlesnp_results_biguanides<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+head_and_neck_singlesnp_results_biguanides$drug<-"Biguanides"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Dipeptidyl peptidase 4 (dpp-iv) inhibitor")
+
+head_and_neck_singlesnp_results_dpp<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+head_and_neck_singlesnp_results_dpp$drug<-"Dipeptidyl peptidase 4 (dpp-iv) inhibitor"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Insulins")
+
+head_and_neck_singlesnp_results_Insulins<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+head_and_neck_singlesnp_results_Insulins$drug<-"Insulins"
+
+
+head_and_neck_singlesnp_results <- rbind(head_and_neck_singlesnp_results_Egger,
+                                         head_and_neck_singlesnp_results_IVW,
+                                         head_and_neck_singlesnp_results_alpha,
+                                         head_and_neck_singlesnp_results_amylin,
+                                         head_and_neck_singlesnp_results_sulfonylureas,
+                                         head_and_neck_singlesnp_results_biguanides,
+                                         head_and_neck_singlesnp_results_dpp,
+                                         head_and_neck_singlesnp_results_Insulins)
+
+head_and_neck_singlesnp_results$or<-1/exp(head_and_neck_singlesnp_results$b)
+head_and_neck_singlesnp_results$uci <- 1/exp(head_and_neck_singlesnp_results$b-1.96*head_and_neck_singlesnp_results$se)
+head_and_neck_singlesnp_results$lci <- 1/exp(head_and_neck_singlesnp_results$b+1.96*head_and_neck_singlesnp_results$se)
+
+
+####hematologic
+
+outcome_gu<-read.csv("gwas_data/meta_hematologic2.csv",  sep = "\t", )
+outcome_gu$phenotype<- 'hematologic system'
+
+outcome_dat <- format_data(
+  dat=outcome_gu,
+  type = "outcome",
+  snps = input_glu$SNP,
+  header = TRUE,
+  phenotype_col = "phenotype",
+  snp_col = "MarkerName",
+  beta_col = "Effect",
+  se_col = "StdErr",
+  effect_allele_col = "Allele1",
+  other_allele_col = "Allele2",
+  pval_col = "P.value",
+)
+H_data1 <- harmonise_data(
+  exposure_dat = exp_dat, 
+  outcome_dat = outcome_dat
+)
+
+hematologic_singlesnp_results<-mr_singlesnp(
+  H_data1,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+mr_forest_plot(hematologic_singlesnp_results, exponentiate = FALSE)
+ggsave("mr_output/met-c-859/system_final/forest/hematologic_cancer.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+hematologic_leaveoneout_results<-mr_leaveoneout(H_data1, parameters = default_parameters(), method = mr_ivw)
+mr_leaveoneout_plot(hematologic_leaveoneout_results)
+ggsave("mr_output/met-c-859/system_final/leaveoneout/hematologic_cancer.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+hematologic_singlesnp_results_IVW <- filter(hematologic_singlesnp_results, 
+                                            SNP=="All - Inverse variance weighted")
+hematologic_singlesnp_results_IVW$drug<-"combined"
+hematologic_singlesnp_results_Egger <- filter(hematologic_singlesnp_results, 
+                                              SNP=="All - MR Egger")
+hematologic_singlesnp_results_Egger$drug<-"combined"
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Alpha glucosidase inhibitors")
+
+
+hematologic_singlesnp_results_alpha<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+hematologic_singlesnp_results_alpha$drug<-"Alpha glucosidase inhibitors"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Amylin analog")
+
+hematologic_singlesnp_results_amylin<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+hematologic_singlesnp_results_amylin$drug<-"Amylin analog"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Sulfonylureas")
+
+hematologic_singlesnp_results_sulfonylureas<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+hematologic_singlesnp_results_sulfonylureas$drug<-"sulfonylureas"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "biguanides")
+
+hematologic_singlesnp_results_biguanides<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+hematologic_singlesnp_results_biguanides$drug<-"Biguanides"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Dipeptidyl peptidase 4 (dpp-iv) inhibitor")
+
+hematologic_singlesnp_results_dpp<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+hematologic_singlesnp_results_dpp$drug<-"Dipeptidyl peptidase 4 (dpp-iv) inhibitor"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Insulins")
+
+hematologic_singlesnp_results_Insulins<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+hematologic_singlesnp_results_Insulins$drug<-"Insulins"
+
+
+hematologic_singlesnp_results <- rbind(hematologic_singlesnp_results_Egger,
+                                       hematologic_singlesnp_results_IVW,
+                                       hematologic_singlesnp_results_alpha,
+                                       hematologic_singlesnp_results_amylin,
+                                       hematologic_singlesnp_results_sulfonylureas,
+                                       hematologic_singlesnp_results_biguanides,
+                                       hematologic_singlesnp_results_dpp,
+                                       hematologic_singlesnp_results_Insulins)
+
+hematologic_singlesnp_results$or<-1/exp(hematologic_singlesnp_results$b)
+hematologic_singlesnp_results$uci <- 1/exp(hematologic_singlesnp_results$b-1.96*hematologic_singlesnp_results$se)
+hematologic_singlesnp_results$lci <- 1/exp(hematologic_singlesnp_results$b+1.96*hematologic_singlesnp_results$se)
+
+
+####gastrointestinal
+outcome_gu<-read.csv("gwas_data/meta_gastrointestinal1.csv",  sep = "\t", )
+outcome_gu$phenotype<- 'gastrointestinal system'
+
+outcome_dat <- format_data(
+  dat=outcome_gu,
+  type = "outcome",
+  snps = input_glu$SNP,
+  header = TRUE,
+  phenotype_col = "phenotype",
+  snp_col = "MarkerName",
+  beta_col = "Effect",
+  se_col = "StdErr",
+  effect_allele_col = "Allele1",
+  other_allele_col = "Allele2",
+  pval_col = "P.value",
+)
+H_data1 <- harmonise_data(
+  exposure_dat = exp_dat, 
+  outcome_dat = outcome_dat
+)
+
+gastrointestinal_singlesnp_results<-mr_singlesnp(
+  H_data1,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+mr_forest_plot(gastrointestinal_singlesnp_results, exponentiate = FALSE)
+ggsave("mr_output/met-c-859/system_final/forest/gastrointestinal_system.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+gastrointestinal_leaveoneout_results<-mr_leaveoneout(H_data1, parameters = default_parameters(), method = mr_ivw)
+mr_leaveoneout_plot(gastrointestinal_leaveoneout_results)
+ggsave("mr_output/met-c-859/system_final/leaveoneout/gastrointestinal_system.jpeg",width = 200, height = 300, unit = "mm", dpi = 600)
+
+gastrointestinal_singlesnp_results_IVW <- filter(gastrointestinal_singlesnp_results, 
+                                       SNP=="All - Inverse variance weighted")
+gastrointestinal_singlesnp_results_IVW$drug<-"combined"
+gastrointestinal_singlesnp_results_Egger <- filter(gastrointestinal_singlesnp_results, 
+                                         SNP=="All - MR Egger")
+gastrointestinal_singlesnp_results_Egger$drug<-"combined"
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Alpha glucosidase inhibitors")
+
+
+gastrointestinal_singlesnp_results_alpha<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gastrointestinal_singlesnp_results_alpha$drug<-"Alpha glucosidase inhibitors"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Amylin analog")
+
+gastrointestinal_singlesnp_results_amylin<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gastrointestinal_singlesnp_results_amylin$drug<-"Amylin analog"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Sulfonylureas")
+
+gastrointestinal_singlesnp_results_sulfonylureas<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gastrointestinal_singlesnp_results_sulfonylureas$drug<-"sulfonylureas"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "biguanides")
+
+gastrointestinal_singlesnp_results_biguanides<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gastrointestinal_singlesnp_results_biguanides$drug<-"Biguanides"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Dipeptidyl peptidase 4 (dpp-iv) inhibitor")
+
+gastrointestinal_singlesnp_results_dpp<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gastrointestinal_singlesnp_results_dpp$drug<-"Dipeptidyl peptidase 4 (dpp-iv) inhibitor"
+
+
+H_data <- merge(SNP_drug,H_data1,by=c("SNP"),all.x = TRUE)
+H_data<-filter(H_data, drug== "Insulins")
+
+gastrointestinal_singlesnp_results_Insulins<-mr_singlesnp(
+  H_data,
+  parameters = default_parameters(),
+  single_method = "mr_wald_ratio",
+  all_method = c("mr_ivw", "mr_egger_regression")
+)
+gastrointestinal_singlesnp_results_Insulins$drug<-"Insulins"
+
+
+gastrointestinal_singlesnp_results <- rbind(gastrointestinal_singlesnp_results_Egger,
+                                  gastrointestinal_singlesnp_results_IVW,
+                                  gastrointestinal_singlesnp_results_alpha,
+                                  gastrointestinal_singlesnp_results_amylin,
+                                  gastrointestinal_singlesnp_results_sulfonylureas,
+                                  gastrointestinal_singlesnp_results_biguanides,
+                                  gastrointestinal_singlesnp_results_dpp,
+                                  gastrointestinal_singlesnp_results_Insulins)
+
+gastrointestinal_singlesnp_results$or<-1/exp(gastrointestinal_singlesnp_results$b)
+gastrointestinal_singlesnp_results$uci <- 1/exp(gastrointestinal_singlesnp_results$b-1.96*gastrointestinal_singlesnp_results$se)
+gastrointestinal_singlesnp_results$lci <- 1/exp(gastrointestinal_singlesnp_results$b+1.96*gastrointestinal_singlesnp_results$se)
+
+
+##save data
+
+list_of_datasets1 <- list("hematologic" = hematologic_leaveoneout_results,
+                          "head_and_neck" = head_and_neck_leaveoneout_results, 
+                          "genitourinary" = genitourinary_leaveoneout_results, 
+                          "gynecologic" = gynecologic_leaveoneout_results,
+                          "skin" = skin_leaveoneout_results,  
+                          "gastrointestinal" = gastrointestinal_leaveoneout_results,
+                          "respiratory" = respiratory_leaveoneout_results)
+
+write.xlsx(list_of_datasets1, file = "mr_output/met-c-859/leaveoneout_system_final.xlsx")
+
+list_of_datasets2 <- list("hematologic" = hematologic_singlesnp_results,
+                          "head_and_neck" = head_and_neck_singlesnp_results, 
+                          "genitourinary" = genitourinary_singlesnp_results, 
+                          "gynecologic" = gynecologic_singlesnp_results,
+                          "skin" = skin_singlesnp_results,  
+                          "gastrointestinal" = gastrointestinal_singlesnp_results,
+                          "respiratory" = respiratory_singlesnp_results)
+
+write.xlsx(list_of_datasets2, file = "mr_output/met-c-859/singlesnp_system_final.xlsx")
