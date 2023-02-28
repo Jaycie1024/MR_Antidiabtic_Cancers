@@ -1,0 +1,59 @@
+clean_bnf <- function() {
+  
+  # Load BNF data ===============================================================
+  
+  df <- read_csv("exposure4.csv")
+  
+  # Format dataframe ============================================================
+  
+  df <- df[,c("Class of antidiabetic medication (route of administration)","Representative agents")]
+  colnames(df) <- c("drug","substance")
+  
+  # Remove polypharmacy medines =================================================
+  
+  df <- df[!grepl("AND",df$drug,ignore.case = FALSE),]
+  
+  # Tidy drug substance information =============================================
+  
+  df$drug <- tolower(df$drug)
+  df$substance <- tolower(df$substance)
+  df <- df[!is.na(df$substance),]
+  df <- df[!grepl("/",df$substance),]
+  
+  df <- unique(df)
+  
+  # Format drug names ===========================================================
+  
+  df$drug <- ifelse(df$drug=="alpha glucosidase inhibitors",
+                    "Alpha glucosidase inhibitors",df$drug)
+  
+  df$drug <- ifelse(df$drug=="amylin analog",
+                    "Amylin analog",df$drug)
+  
+  df$drug <- ifelse(df$drug=="biguanide",
+                    "Biguanide",df$drug)
+  
+  df$drug <- ifelse(df$drug=="dipeptidyl peptidase 4 (dpp-iv) inhibitor",
+                    "Dipeptidyl peptidase 4 (dpp-iv) inhibitor",df$drug)
+  
+  df$drug <- ifelse(df$drug=="GLP-1 agonists",
+                    "Glucagon-like peptide 1 agonists",df$drug)
+  
+  df$drug <- ifelse(df$drug=="meglitinides",
+                    "Meglitinides",df$drug)
+  
+  df$drug <- ifelse(df$drug=="insulins",
+                    "Insulins",df$drug)
+  
+  df$drug <- ifelse(df$drug=="sodium-glucose cotransporter (SGLT2) inhibitor",
+                    "Sodium-glucose cotransporter (SGLT2) inhibitor",df$drug)
+  
+  df$drug <- ifelse(df$drug=="sulfonylureas",
+                    "Sulfonylureas",df$drug)
+  
+  df$drug <- ifelse(df$drug=="thiazolidinediones",
+                    "Thiazolidinediones",df$drug)
+  
+  return(df)
+  
+}
