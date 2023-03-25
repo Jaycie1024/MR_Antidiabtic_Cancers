@@ -1,0 +1,161 @@
+cd
+curl -O http://csg.sph.umich.edu/abecasis/Metal/download/Linux-metal.tar.gz
+tar -xvzf Linux-metal.tar.gz
+
+metal
+
+
+###Describe and process the head and neck cancer input files
+SCHEME   STDERR
+MARKER   variant_id
+WEIGHT   N
+ALLELE   effect_allele other_allele
+FREQ     effect_allele_frequency
+EFFECT   beta
+STDERR   standard_error
+PVAL     p_value
+
+PROCESS oral_cavity_cancer.tsv
+PROCESS oropharyngeal_cancer.tsv
+PROCESS laryngeal_cancer.tsv
+PROCESS salivary_gland_carcinoma.tsv
+PROCESS tongue_cancer.tsv
+
+OUTFILE meta_head_and_neck .csv 
+
+# Execute meta-analysis
+ANALYZE
+
+
+###Describe and process the gastrointestinal cancer input files
+SCHEME   STDERR
+MARKER   variant_id
+WEIGHT   N
+ALLELE   effect_allele other_allele
+FREQ     effect_allele_frequency
+EFFECT   beta
+STDERR   standard_error
+PVAL     p_value
+
+PROCESS anal_cancer.tsv
+PROCESS colon_cancer.tsv
+PROCESS bile_duct_cancer.tsv
+PROCESS gastric_cancer.tsv
+PROCESS small_intestine_cancer.tsv
+PROCESS pancreatic_cancer.tsv
+PROCESS liver_cancer.tsv
+PROCESS rectal_cancer.tsv
+PROCESS esophageal_cancer.tsv
+
+OUTFILE meta_gastrointestinal .csv 
+
+# Execute meta-analysis
+ANALYZE
+
+
+
+###Describe and process the genitourinary cancer input files
+SCHEME   STDERR
+MARKER   variant_id
+WEIGHT   N
+ALLELE   effect_allele other_allele
+FREQ     effect_allele_frequency
+EFFECT   beta
+STDERR   standard_error
+PVAL     p_value
+
+PROCESS bladder_cancer.tsv
+PROCESS prostate_cancer.tsv
+PROCESS testicular_cancer.tsv
+PROCESS kidney_cancer.tsv
+
+OUTFILE meta_genitourinaryl .csv 
+
+# Execute meta-analysis
+ANALYZE
+
+
+###Describe and process the skin cancer input files
+MARKER   variant_id
+WEIGHT   N
+ALLELE   effect_allele other_allele
+FREQ     effect_allele_frequency
+EFFECT   beta
+STDERR   standard_error
+PVAL     p_value
+
+PROCESS melanoma.tsv
+PROCESS squamous_cell_carcinoma.tsv
+PROCESS basal_cell_carcinoma.tsv
+
+OUTFILE meta_skin .csv 
+
+# Execute meta-analysis
+ANALYZE
+
+
+
+# Describe and process the gynecologic cancer input files
+SCHEME   STDERR
+MARKER   variant_id
+ALLELE   effect_allele other_allele
+FREQ     effect_allele_frequency
+WEIGHT   N
+EFFECT   beta
+STDERR   standard_error
+PVAL     p_value
+
+PROCESS cervix_uteri_cancer.tsv
+PROCESS endometrial_cancer.tsv
+PROCESS ovarian_cancer.tsv
+PROCESS vulvar_cancer.tsv
+
+OUTFILE meta_gynecologic1 .csv 
+
+# Execute meta-analysis
+ANALYZE
+
+
+### Describe and process the hematologic cancer input files
+SCHEME   STDERR
+MARKER   variant_id
+WEIGHT   N
+ALLELE   effect_allele other_allele
+FREQ     effect_allele_frequency
+EFFECT   beta
+STDERR   standard_error
+PVAL     p_value
+
+PROCESS multiple_myeloma.tsv
+PROCESS chronic_myelogenous_leukemia.tsv
+PROCESS acute_myeloid_leukemia.tsv
+PROCESS chronic_lymphocytic_leukemia.tsv
+PROCESS non_hodgkin_lymphoma.tsv
+PROCESS hodgkin_lymphoma.tsv
+PROCESS connective_tissue_cancer.tsv
+
+OUTFILE meta_hematologic1 .csv 
+
+# Execute meta-analysis
+ANALYZE
+
+###Describe and process the vulvar cancer input files
+SCHEME   STDERR
+MARKER   variant_id
+WEIGHT   N
+ALLELE   effect_allele other_allele
+FREQ     effect_allele_frequency
+EFFECT   beta
+STDERR   standard_error
+PVAL     p_value
+
+PROCESS oral_cavity_cancer.tsv
+PROCESS oropharyngeal_cancer.tsv
+PROCESS laryngeal_cancer.tsv
+PROCESS salivary_gland_carcinoma.tsv
+PROCESS tongue_cancer.tsv
+
+OUTFILE meta_head_and_neck .csv 
+
+# Execute meta-analysis
+ANALYZE
